@@ -1,182 +1,92 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+//pocetak
 typedef struct {
     int id;
-    char name[50];
-    int age;
-    float height;
-    float weight;
-} Member;
-
+    char ime[50];
+    int godine;
+    float visina;
+    float tezina;
+} Član;
+//izbornik
 typedef enum {
-    ADD_MEMBER = 1,
-    VIEW_MEMBERS,
-    UPDATE_MEMBER,
-    DELETE_MEMBER,
-    EXIT
-} MenuOptions;
+    DODAJ_CLANA = 1,
+    PREGLED_CLANOVA,
+    AZURIRAJ_CLANA,
+    OBRISI_CLANA,
+    IZLAZ
+} IzbornikOpcije;
 
-static const char* FILENAME = "members.dat";
-
-void clearInputBuffer() {
-    while(getchar() != '\n');
+static const char* DATOTEKA = "clanovi.dat";
+static Član* članovi = NULL;
+static size_t brojČlanova = 0;
+//ciscenje buffera
+void ocistiUlazniBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
+//ucitavanje datoteke clanova
+int ucitajČlanove() {
+    FILE* dat = fopen(DATOTEKA, "rb");
+    if (!dat) return 0; // Ako nema datoteke, nema greške
 
-void createMember() {
-    FILE* file = fopen(FILENAME, "ab");
-    if (!file) {
-        perror("Greška pri otvaranju datoteke");
-        return;
-    }
+    fseek(dat, 0, SEEK_END);
+    long velicina = ftell(dat);
+    rewind(dat);
 
-    Member m;
-    printf("Unesite ID: ");
-    scanf("%d", &m.id);
-    clearInputBuffer();
-    
-    printf("Unesite ime: ");
-    fgets(m.name, 50, stdin);
-    m.name[strcspn(m.name, "\n")] = '\0';
-    
-    printf("Unesite godine: ");
-    scanf("%d", &m.age);
-    
-    printf("Unesite visinu (cm): ");
-    scanf("%f", &m.height);
-    
-    printf("Unesite težinu (kg): ");
-    scanf("%f", &m.weight);
-
-    fwrite(&m, sizeof(Member), 1, file);
-    fclose(file);
-    printf("Član uspješno dodan.\n");
-}
-
-void readMembers() {
-    FILE* file = fopen(FILENAME, "rb");
-    if (!file) {
-        perror("Greška pri otvaranju datoteke");
-        return;
-    }
-
-    Member m;
-    printf("\nPopis članova:\n");
-    while(fread(&m, sizeof(Member), 1, file)) {
-        printf("ID: %-4d | Ime: %-20s | Godine: %-3d | Visina: %-5.1f | Težina: %-5.1f\n",
-               m.id, m.name, m.age, m.height, m.weight);
-    }
-    fclose(file);
-}
-
-void updateMember() {
-    FILE* file = fopen(FILENAME, "r+b");
-    if (!file) {
-        perror("Greška pri otvaranju datoteke");
-        return;
-    }
-
-    int targetId, found = 0;
-    printf("Unesite ID člana za ažuriranje: ");
-    scanf("%d", &targetId);
-
-    Member m;
-    while(fread(&m, sizeof(Member), 1, file)) {
-        if(m.id == targetId) {
-            found = 1;
-            clearInputBuffer();
-            
-            printf("Novo ime (%s): ", m.name);
-            fgets(m.name, 50, stdin);
-            m.name[strcspn(m.name, "\n")] = '\0';
-            
-            printf("Nove godine (%d): ", m.age);
-            scanf("%d", &m.age);
-            
-            printf("Nova visina (%.1f): ", m.height);
-            scanf("%f", &m.height);
-            
-            printf("Nova težina (%.1f): ", m.weight);
-            scanf("%f", &m.weight);
-
-            fseek(file, -sizeof(Member), SEEK_CUR);
-            fwrite(&m, sizeof(Member), 1, file);
-            break;
+    brojČlanova = velicina / sizeof(Član);
+    if (brojČlanova > 0) {
+        članovi = malloc(brojČlanova * sizeof(Član));
+        if (!članovi) {
+            fclose(dat);
+            return -1;
         }
+        fread(članovi, sizeof(Član), brojČlanova, dat);
     }
-
-    if(!found) {
-        printf("Član s ID %d nije pronađen.\n", targetId);
-    }
-    fclose(file);
-}
-
-void deleteMember() {
-    FILE *source = fopen(FILENAME, "rb");
-    if (!source) {
-        perror("Greška pri otvaranju datoteke");
-        return;
-    }
-
-    FILE *temp = fopen("temp.dat", "wb");
-    if (!temp) {
-        perror("Greška pri kreiranju privremene datoteke");
-        fclose(source);
-        return;
-    }
-
-    int targetId, found = 0;
-    printf("Unesite ID člana za brisanje: ");
-    scanf("%d", &targetId);
-
-    Member m;
-    while(fread(&m, sizeof(Member), 1, source)) {
-        if(m.id != targetId) {
-            fwrite(&m, sizeof(Member), 1, temp);
-        } else {
-            found = 1;
-        }
-    }
-
-    fclose(source);
-    fclose(temp);
-
-    if(found) {
-        remove(FILENAME);
-        rename("temp.dat", FILENAME);
-        printf("Član uspješno obrisan.\n");
-    } else {
-        remove("temp.dat");
-        printf("Član s ID %d nije pronađen.\n", targetId);
-    }
-}
-
-void showMenu() {
-    int choice;
-    do {
-        printf("\n=== FITNESS CENTAR ===\n");
-        printf("%d. Dodaj člana\n", ADD_MEMBER);
-        printf("%d. Pregled članova\n", VIEW_MEMBERS);
-        printf("%d. Ažuriraj člana\n", UPDATE_MEMBER);
-        printf("%d. Obriši člana\n", DELETE_MEMBER);
-        printf("%d. Izlaz\n", EXIT);
-        printf("Odabir: ");
-        scanf("%d", &choice);
-        clearInputBuffer();
-
-        switch(choice) {
-            case ADD_MEMBER: createMember(); break;
-            case VIEW_MEMBERS: readMembers(); break;
-            case UPDATE_MEMBER: updateMember(); break;
-            case DELETE_MEMBER: deleteMember(); break;
-            case EXIT: printf("Doviđenja!\n"); break;
-            default: printf("Nevažeći odabir!\n");
-        }
-    } while(choice != EXIT);
-}
-
-int main() {
-    showMenu();
+    fclose(dat);
     return 0;
 }
+//spremanje clanova
+int spremiČlanove() {
+    FILE* dat = fopen(DATOTEKA, "wb");
+    if (!dat) {
+        perror("Greška pri spremanju");
+        return -1;
+    }
+    fwrite(članovi, sizeof(Član), brojČlanova, dat);
+    fclose(dat);
+    return 0;
+}
+//dodavanje clanova
+int dodajČlana() {
+    Član član;
+    printf("Unesite ID: ");
+    scanf("%d", &član.id);
+    ocistiUlazniBuffer();
+
+    printf("Unesite ime: ");
+    fgets(član.ime, 50, stdin);
+    član.ime[strcspn(član.ime, "\n")] = '\0';
+
+    printf("Unesite godine: ");
+    scanf("%d", &član.godine);
+
+    printf("Unesite visinu (cm): ");
+    scanf("%f", &član.visina);
+
+    printf("Unesite težinu (kg): ");
+    scanf("%f", &član.tezina);
+
+    Član* temp = realloc(članovi, (brojČlanova + 1) * sizeof(Član));
+    if (!temp) {
+        perror("Greška");
+        return -1;
+    }
+    članovi = temp;
+    članovi[brojČlanova++] = član;
+    printf("Član uspješno dodan.\n");
+    return 0;
+}
+
+
