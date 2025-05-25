@@ -88,5 +88,13 @@ int dodajČlana() {
     printf("Član uspješno dodan.\n");
     return 0;
 }
+//pregled člana
 
+//azuriranje clanova
+
+//brisanje clanova
+
+//prikaz izbornika
+
+//return
 
