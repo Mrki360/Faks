@@ -1,15 +1,18 @@
+#ifndef HEADER_H
+#define HEADER_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//pocetak
+
 typedef struct {
     int id;
     char ime[50];
     int godine;
     float visina;
     float tezina;
-} Član;
-//izbornik
+} Clan;
+
 typedef enum {
     DODAJ_CLANA = 1,
     PREGLED_CLANOVA,
@@ -18,83 +21,18 @@ typedef enum {
     IZLAZ
 } IzbornikOpcije;
 
-static const char* DATOTEKA = "clanovi.dat";
-static Član* članovi = NULL;
-static size_t brojČlanova = 0;
-//ciscenje buffera
-void ocistiUlazniBuffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
-}
-//ucitavanje datoteke clanova
-int ucitajČlanove() {
-    FILE* dat = fopen(DATOTEKA, "rb");
-    if (!dat) return 0; // Ako nema datoteke, nema greške
+extern Clan* clanovi;
+extern size_t broj_clanova;
+extern const char* DATOTEKA;
 
-    fseek(dat, 0, SEEK_END);
-    long velicina = ftell(dat);
-    rewind(dat);
+void ocisti_ulazni_buffer();
 
-    brojČlanova = velicina / sizeof(Član);
-    if (brojČlanova > 0) {
-        članovi = malloc(brojČlanova * sizeof(Član));
-        if (!članovi) {
-            fclose(dat);
-            return -1;
-        }
-        fread(članovi, sizeof(Član), brojČlanova, dat);
-    }
-    fclose(dat);
-    return 0;
-}
-//spremanje clanova
-int spremiČlanove() {
-    FILE* dat = fopen(DATOTEKA, "wb");
-    if (!dat) {
-        perror("Greška pri spremanju");
-        return -1;
-    }
-    fwrite(članovi, sizeof(Član), brojČlanova, dat);
-    fclose(dat);
-    return 0;
-}
-//dodavanje clanova
-int dodajČlana() {
-    Član član;
-    printf("Unesite ID: ");
-    scanf("%d", &član.id);
-    ocistiUlazniBuffer();
+int ucitaj_clanove();
+int spremi_clanove();
+int dodaj_clana();
+int pregled_clanova();
+int azuriraj_clana();
+int obrisi_clana();
+int prikazi_izbornik();
 
-    printf("Unesite ime: ");
-    fgets(član.ime, 50, stdin);
-    član.ime[strcspn(član.ime, "\n")] = '\0';
-
-    printf("Unesite godine: ");
-    scanf("%d", &član.godine);
-
-    printf("Unesite visinu (cm): ");
-    scanf("%f", &član.visina);
-
-    printf("Unesite težinu (kg): ");
-    scanf("%f", &član.tezina);
-
-    Član* temp = realloc(članovi, (brojČlanova + 1) * sizeof(Član));
-    if (!temp) {
-        perror("Greška");
-        return -1;
-    }
-    članovi = temp;
-    članovi[brojČlanova++] = član;
-    printf("Član uspješno dodan.\n");
-    return 0;
-}
-//pregled člana
-
-//azuriranje clanova
-
-//brisanje clanova
-
-//prikaz izbornika
-
-//return
-
+#endif
