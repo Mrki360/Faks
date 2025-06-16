@@ -20,9 +20,8 @@ typedef enum {
     AZURIRAJ_CLANA,
     OBRISI_CLANA,
     PRETRAZI_PREZIME,
-    OBRISI_DATOTEKU = 6,
-    PREIMENUJ_DATOTEKU = 7,
-    IZLAZ = 8
+    OBRISI_DATOTEKU,
+    IZLAZ
 } IzbornikOpcije;
 
 extern Clan* clanovi;
@@ -38,8 +37,7 @@ int pregled_clanova();
 int azuriraj_clana();
 int obrisi_clana();
 int pretrazi_po_prezimenu();
-int obrisi_datoteku(const char* ime);
-int preimenuj_datoteku(const char* staro_ime, const char* novo_ime);
+int obrisi_datoteku();
 int prikazi_izbornik();
 
 #endif
