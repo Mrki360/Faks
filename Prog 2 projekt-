@@ -35,7 +35,92 @@ int spremi_clanove() {
     fclose(dat);
     return 0;
 }
+int azuriraj_clana() {
+    int id;
+    printf("Unesite ID člana za ažuriranje: ");
+    if (scanf("%d", &id) != 1) {
+        printf("Neispravan ID!\n");
+        ocisti_ulazni_buffer();
+        return -1;
+    }
+    OCISTI_BUFFER();
 
+    for (size_t i = 0; i < broj_clanova; i++) {
+        if (clanovi[i].id == id) {
+            printf("Novo ime (%s): ", clanovi[i].ime);
+            fgets(clanovi[i].ime, 50, stdin);
+            clanovi[i].ime[strcspn(clanovi[i].ime, "\n")] = '\0';
+
+            printf("Novo prezime (%s): ", clanovi[i].prezime);
+            fgets(clanovi[i].prezime, 50, stdin);
+            clanovi[i].prezime[strcspn(clanovi[i].prezime, "\n")] = '\0';
+
+            printf("Nove godine (%d): ", clanovi[i].godine);
+            if (scanf("%d", &clanovi[i].godine) != 1) {
+                printf("Neispravan unos!\n");
+                ocisti_ulazni_buffer();
+                return -1;
+            }
+            ocisti_ulazni_buffer();
+
+            printf("Nova visina (%.1f): ", clanovi[i].visina);
+            if (scanf("%f", &clanovi[i].visina) != 1) {
+                printf("Neispravan unos!\n");
+                ocisti_ulazni_buffer();
+                return -1;
+            }
+            ocisti_ulazni_buffer();
+
+            printf("Nova težina (%.1f): ", clanovi[i].tezina);
+            if (scanf("%f", &clanovi[i].tezina) != 1) {
+                printf("Neispravan unos!\n");
+                ocisti_ulazni_buffer();
+                return -1;
+            }
+            OCISTI_BUFFER();
+
+            printf("Član ažuriran.\n");
+            return 0;
+        }
+    }
+    printf("Član nije pronađen!\n");
+    return -1;
+}
+int obrisi_datoteku(const char* ime) {
+    if (remove(ime) == 0) {
+        printf("Datoteka uspješno obrisana.\n");
+        return 0;
+    } else {
+        perror("Greška pri brisanju");
+        return -1;
+    }
+}
+
+int obrisi_clana() {
+    int id;
+    printf("Unesite ID člana za brisanje: ");
+    if (scanf("%d", &id) != 1) {
+        printf("Neispravan ID!\n");
+        ocisti_ulazni_buffer();
+        return -1;
+    }
+    ocisti_ulazni_buffer();
+
+    for (size_t i = 0; i < broj_clanova; i++) {
+        if (clanovi[i].id == id) {
+            memmove(&clanovi[i], &clanovi[i+1], (broj_clanova - i - 1) * sizeof(Clan));
+            broj_clanova--;
+            Clan* temp = realloc(clanovi, broj_clanova * sizeof(Clan));
+            if (temp || broj_clanova == 0) {
+                clanovi = temp;
+            }
+            printf("Član obrisan.\n");
+            return 0;
+        }
+    }
+    printf("Član nije pronađen!\n");
+    return -1;
+}
 int dodaj_clana() {
     Clan clan;
     printf("Unesite ID: ");
@@ -44,7 +129,7 @@ int dodaj_clana() {
         ocisti_ulazni_buffer();
         return -1;
     }
-   OCISTI_BUFFER();
+    ocisti_ulazni_buffer();
 
     for (size_t i = 0; i < broj_clanova; i++) {
         if (clanovi[i].id == clan.id) {
@@ -91,113 +176,30 @@ int dodaj_clana() {
     clanovi[broj_clanova++] = clan;
     return 0;
 }
-int azuriraj_clana() {
-    int id;
-    printf("Unesite ID člana za ažuriranje: ");
-    if (scanf("%d", &id) != 1) {
-        printf("Neispravan ID!\n");
-        ocisti_ulazni_buffer();
-        return -1;
-    }
-    ocisti_ulazni_buffer();
-
-    for (size_t i = 0; i < broj_clanova; i++) {
-        if (clanovi[i].id == id) {
-            printf("Novo ime (%s): ", clanovi[i].ime);
-            fgets(clanovi[i].ime, 50, stdin);
-            clanovi[i].ime[strcspn(clanovi[i].ime, "\n")] = '\0';
-
-            printf("Novo prezime (%s): ", clanovi[i].prezime);
-            fgets(clanovi[i].prezime, 50, stdin);
-            clanovi[i].prezime[strcspn(clanovi[i].prezime, "\n")] = '\0';
-
-            printf("Nove godine (%d): ", clanovi[i].godine);
-            if (scanf("%d", &clanovi[i].godine) != 1) {
-                printf("Neispravan unos!\n");
-                ocisti_ulazni_buffer();
-                return -1;
-            }
-            ocisti_ulazni_buffer();
-
-            printf("Nova visina (%.1f): ", clanovi[i].visina);
-            if (scanf("%f", &clanovi[i].visina) != 1) {
-                printf("Neispravan unos!\n");
-                ocisti_ulazni_buffer();
-                return -1;
-            }
-            ocisti_ulazni_buffer();
-
-            printf("Nova težina (%.1f): ", clanovi[i].tezina);
-            if (scanf("%f", &clanovi[i].tezina) != 1) {
-                printf("Neispravan unos!\n");
-                ocisti_ulazni_buffer();
-                return -1;
-            }
-            ocisti_ulazni_buffer();
-
-            printf("Član ažuriran.\n");
-            return 0;
-        }
-    }
-    printf("Član nije pronađen!\n");
-    return -1;
-}
-
-int obrisi_clana() {
-    int id;
-    printf("Unesite ID člana za brisanje: ");
-    if (scanf("%d", &id) != 1) {
-        printf("Neispravan ID!\n");
-        ocisti_ulazni_buffer();
-        return -1;
-    }
-    ocisti_ulazni_buffer();
-
-    for (size_t i = 0; i < broj_clanova; i++) {
-        if (clanovi[i].id == id) {
-            memmove(&clanovi[i], &clanovi[i+1], (broj_clanova - i - 1) * sizeof(Clan));
-            broj_clanova--;
-            Clan* temp = realloc(clanovi, broj_clanova * sizeof(Clan));
-            if (temp || broj_clanova == 0) {
-                clanovi = temp;
-            }
-            printf("Član obrisan.\n");
-            return 0;
-        }
-    }
-    printf("Član nije pronađen!\n");
-    return -1;
-}
-int usporedi_clanove_po_id(const void *a, const void *b){
-    return((Clan*)a)->id - ((Clan*)b)->id;
-}
 
 int pregled_clanova() {
-    if(broj_clanova==0){
+    if (broj_clanova == 0) {
         printf("Nema članova u evidenciji.\n");
-        return -1;
+        return 0;
     }
-    qsort(clanovi, broj_clanova, sizeof(Clan), usporedi_clanove_po_id);
     printf("\nPopis članova:\n");
-    for(size_t i = 0; i < broj_clanova; i++){
-        printf("ID: %d | Ime: %s | Prezime: %s |  Godine: %d  | Visina: %.1f | Težina: %.1f\n", clanovi[i].id, clanovi[i].ime, clanovi[i].prezime, clanovi[i].godine, clanovi[i].visina, clanovi[i].tezina);
+    for (size_t i = 0; i < broj_clanova; i++) {
+        printf("ID: %d | Ime: %s | Prezime: %s | Godine: %d | Visina: %.1f | Težina: %.1f\n",
+               clanovi[i].id, clanovi[i].ime, clanovi[i].prezime, clanovi[i].godine, clanovi[i].visina, clanovi[i].tezina);
     }
+    return 0;
 }
+
 int usporedi_prezime(const void *a, const void *b) {
     const Clan *clanA = *(const Clan **)a;
     const Clan *clanB = *(const Clan **)b;
     return strcmp(clanA->prezime, clanB->prezime);
 }
 
-static Clan** rekurzivna_pretraga(Clan **polje, const char *prezime, int lijevo, int desno) {
-    if (lijevo > desno) return NULL;
-
-    int sredina = (lijevo + desno) / 2;
-    int usporedba = strcmp(prezime, polje[sredina]->prezime);
-
-    if (usporedba == 0) return &polje[sredina];
-    if (usporedba < 0) return rekurzivna_pretraga(polje, prezime, lijevo, sredina - 1);
-    return rekurzivna_pretraga(polje, prezime, sredina + 1, desno);
+int usporedi_prezime_s_kljucem(const void *kljuc, const void *element) {
+    const char *trazeno_prezime = (const char *)kljuc;
+    const Clan *clan = *(const Clan **)element;
+    return strcmp(trazeno_prezime, clan->prezime);
 }
 
 int pretrazi_po_prezimenu() {
@@ -221,31 +223,23 @@ int pretrazi_po_prezimenu() {
     }
     qsort(temp, broj_clanova, sizeof(Clan *), usporedi_prezime);
     
-    Clan **rezultat = rekurzivna_pretraga(temp, trazeno_prezime, 0, broj_clanova - 1);
-    
+    Clan **rezultat = bsearch(trazeno_prezime, temp, broj_clanova, sizeof(Clan *), usporedi_prezime_s_kljucem);
+
     if (rezultat) {
         printf("\nPronađeni članovi:\n");
-        int indeks = rezultat - temp;
+        size_t indeks = rezultat - temp;
         while (indeks > 0 && strcmp(temp[indeks-1]->prezime, trazeno_prezime) == 0) {
             indeks--;
         }
-        for (int i = indeks; i < broj_clanova && strcmp(temp[i]->prezime, trazeno_prezime) == 0; i++) {
+        for (size_t i = indeks; i < broj_clanova && strcmp(temp[i]->prezime, trazeno_prezime) == 0; i++) {
             printf("ID: %d | Ime: %s | Prezime: %s | Godine: %d | Visina: %.1f | Težina: %.1f\n",
                    temp[i]->id, temp[i]->ime, temp[i]->prezime, temp[i]->godine, temp[i]->visina, temp[i]->tezina);
         }
     } else {
         printf("Nema članova s prezimenom '%s'.\n", trazeno_prezime);
     }
-
     free(temp);
     return 0;
-}
-int obrisi_datoteku(const char* ime) {
-    return remove(ime);
-}
-
-int preimenuj_datoteku(const char* staro_ime, const char* novo_ime) {
-    return rename(staro_ime, novo_ime);
 }
 
 int prikazi_izbornik() {
@@ -261,7 +255,6 @@ int prikazi_izbornik() {
         printf("%d. Obriši člana\n", OBRISI_CLANA);
         printf("%d. Pretraži po prezimenu\n", PRETRAZI_PREZIME);
         printf("%d. Obriši datoteku\n", OBRISI_DATOTEKU);
-        printf("%d. Preimenuj datoteku\n", PREIMENUJ_DATOTEKU);
         printf("%d. Izlaz\n", IZLAZ);
         printf("Odabir: ");
         if (scanf("%d", &izbor) != 1) {
@@ -276,23 +269,14 @@ int prikazi_izbornik() {
             case AZURIRAJ_CLANA: azuriraj_clana(); break;
             case OBRISI_CLANA: obrisi_clana(); break;
             case PRETRAZI_PREZIME: pretrazi_po_prezimenu(); break;
-            case OBRISI_DATOTEKU: 
-    if (obrisi_datoteku(DATOTEKA) == 0) printf("Datoteka obrisana.\n");
-    else perror("Greška pri brisanju");
-    break;
-            case PREIMENUJ_DATOTEKU: {
-    char novo_ime[100];
-    printf("Novo ime datoteke: ");
-    fgets(novo_ime, 100, stdin);
-    novo_ime[strcspn(novo_ime, "\n")] = '\0';
-    if (preimenuj_datoteku(DATOTEKA, novo_ime) == 0) {
-        printf("Datoteka preimenovana u %s.\n", novo_ime);
-        DATOTEKA = novo_ime;
-    } else {
-        perror("Greška pri preimenovanju");
-    }
-    break;
-}
+            case OBRISI_DATOTEKU: {
+            char ime[256];
+            printf("Unesite ime datoteke za brisanje: ");
+            fgets(ime, 256, stdin);
+            ime[strcspn(ime, "\n")] = '\0';
+            obrisi_datoteku(ime);
+            break;
+        }   
             case IZLAZ: spremi_clanove(); free(clanovi); clanovi = NULL; break;
             default: printf("Nevažeći odabir!\n");
         }
