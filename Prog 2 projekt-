@@ -8,6 +8,7 @@
 typedef struct {
     int id;
     char ime[50];
+    char prezime[50];
     int godine;
     float visina;
     float tezina;
@@ -18,6 +19,7 @@ typedef enum {
     PREGLED_CLANOVA,
     AZURIRAJ_CLANA,
     OBRISI_CLANA,
+    PRETRAZI_PREZIME,
     IZLAZ
 } IzbornikOpcije;
 
@@ -25,7 +27,7 @@ extern Clan* clanovi;
 extern size_t broj_clanova;
 extern const char* DATOTEKA;
 
-void ocisti_ulazni_buffer();
+void ocisti_ulazni_buffer(void);
 
 int ucitaj_clanove();
 int spremi_clanove();
@@ -33,6 +35,7 @@ int dodaj_clana();
 int pregled_clanova();
 int azuriraj_clana();
 int obrisi_clana();
+int pretrazi_po_prezimenu();
 int prikazi_izbornik();
 
 #endif
