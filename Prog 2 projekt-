@@ -1,6 +1,6 @@
 #ifndef HEADER_H
 #define HEADER_H
-
+#define OCISTI_BUFFER() do { int c; while ((c = getchar()) != '\n' && c != EOF); } while(0)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +20,9 @@ typedef enum {
     AZURIRAJ_CLANA,
     OBRISI_CLANA,
     PRETRAZI_PREZIME,
-    IZLAZ
+    OBRISI_DATOTEKU = 6,
+    PREIMENUJ_DATOTEKU = 7,
+    IZLAZ = 8
 } IzbornikOpcije;
 
 extern Clan* clanovi;
@@ -36,6 +38,8 @@ int pregled_clanova();
 int azuriraj_clana();
 int obrisi_clana();
 int pretrazi_po_prezimenu();
+int obrisi_datoteku(const char* ime);
+int preimenuj_datoteku(const char* staro_ime, const char* novo_ime);
 int prikazi_izbornik();
 
 #endif
