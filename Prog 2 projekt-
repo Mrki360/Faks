@@ -177,11 +177,17 @@ int dodaj_clana() {
     return 0;
 }
 
+int usporedi_clanove_po_id(const void* a, const void* b) {
+    return ((Clan*)a)->id - ((Clan*)b)->id;
+}
+
 int pregled_clanova() {
     if (broj_clanova == 0) {
         printf("Nema članova u evidenciji.\n");
         return 0;
     }
+     qsort(clanovi, broj_clanova, sizeof(Clan), usporedi_clanove_po_id);
+     
     printf("\nPopis članova:\n");
     for (size_t i = 0; i < broj_clanova; i++) {
         printf("ID: %d | Ime: %s | Prezime: %s | Godine: %d | Visina: %.1f | Težina: %.1f\n",
@@ -207,7 +213,7 @@ int pretrazi_po_prezimenu() {
         printf("Nema članova za pretragu.\n");
         return 0;
     }
-
+    
     char trazeno_prezime[50];
     printf("Unesite prezime za pretragu: ");
     fgets(trazeno_prezime, 50, stdin);
