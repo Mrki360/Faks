@@ -177,7 +177,7 @@ int dodaj_clana() {
     return 0;
 }
 
-int usporedi_clanove_po_id(const void* a, const void* b) {
+static int usporedi_clanove_po_id(const void* a, const void* b) {
     return ((Clan*)a)->id - ((Clan*)b)->id;
 }
 
